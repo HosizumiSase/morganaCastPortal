@@ -1,0 +1,2 @@
+# morganaCastPortal
+モルガナのキャスト用ぺーじ
