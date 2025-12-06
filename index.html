@@ -3,29 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MORGANA Cast Portal</title>
+    <title>MORGANA Portal</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    
     <style>
-        /* 余白を完全にゼロにする */
-        body, html { 
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; /* 外側のスクロールバーを消す */
-            background-color: #0f0518; 
-        }
-        /* iframeを画面いっぱいに広げる */
-        iframe { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-            display: block; 
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #0f0518; }
+        iframe { width: 100%; height: 100%; border: none; display: block; }
+        .loading { color: #d4af37; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: sans-serif; }
     </style>
 </head>
 <body>
-    <iframe src="https://script.google.com/macros/s/AKfycbyaEXpH6Gho0XvqF-GObTEI6Tv2LZ4i0a9dhCerb5tSeqVS9DvvLVvFAW_Ek7RLoziP/exec"></iframe>
+    <div id="loader" class="loading">Loading...</div>
+    
+    <iframe id="main-frame"></iframe>
+
+    <script>
+        // ▼▼▼ 設定エリア ▼▼▼
+        
+        // 1. 管理ツール（今回作ったGAS）のURL
+        const ADMIN_URL = "https://script.google.com/macros/s/AKfycbyaEXpH6Gho0XvqF-GObTEI6Tv2LZ4i0a9dhCerb5tSeqVS9DvvLVvFAW_Ek7RLoziP/exec";
+        
+        // 2. 一般公開用（キャスト一覧など）のURL
+        // ※まだ決まっていない場合は、仮のURLを入れるか、空文字 "" にしてください
+        const PUBLIC_URL = "https://example.com/cast-list"; 
+
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+        // URLパラメータを取得 (?page=admin など)
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get('page');
+        const frame = document.getElementById('main-frame');
+        const loader = document.getElementById('loader');
+
+        // 振り分け処理
+        if (page === 'admin') {
+            // ?page=admin があれば管理ツールを表示
+            document.title = "MORGANA - Manager";
+            frame.src = ADMIN_URL;
+        } else {
+            // それ以外は一般公開用ページを表示
+            if (PUBLIC_URL) {
+                document.title = "MORGANA - Cast Portal";
+                frame.src = PUBLIC_URL;
+            } else {
+                // PUBLIC_URL が未設定の場合の表示
+                loader.innerHTML = "Access Denied or Under Construction";
+                frame.style.display = "none";
+            }
+        }
+
+        // iframe読み込み完了時にローディングを消す
+        frame.onload = () => {
+            loader.style.display = "none";
+        };
+    </script>
 </body>
 </html>
